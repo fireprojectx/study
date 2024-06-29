@@ -3,6 +3,7 @@ import Head from 'next/head';
 import { jsPDF } from 'jspdf';
 import * as XLSX from 'xlsx';
 import axios from 'axios';
+import { TailSpin } from 'react-loader-spinner';
 
 const Home = () => {
     const [discipline, setDiscipline] = useState('');
@@ -18,6 +19,7 @@ const Home = () => {
     const [disciplineOptions, setDisciplineOptions] = useState([]);
     const [contentOptions, setContentOptions] = useState([]);
     const [text, setText] = useState('');
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         let intervalId;
@@ -78,14 +80,17 @@ const Home = () => {
     };
 
     const handleTextSubmit = async () => {
+        setLoading(true);
         try {
-            const response = await axios.post('http://localhost:5000/analyze-text', { text });
+            const response = await axios.post('/api/analyze-text', { text });
 
             console.log('Resposta da análise:', response.data);
             setDisciplineOptions(response.data.disciplines);
             setContentOptions(response.data.topics);
         } catch (error) {
             console.error('Failed to analyze text:', error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -185,7 +190,8 @@ const Home = () => {
                         border: 1px solid #ddd;
                     }
                     th, td {
-                        padding: 8px; text-align: left;
+                        padding: 8px;
+                        text-align: left;
                     }
                     th {
                         background-color: #67B18F;
@@ -205,7 +211,8 @@ const Home = () => {
                     }
                     #summaryModalContent {
                         background-color: #fefefe;
-                        margin: auto; padding: 20px;
+                        margin: auto;
+                        padding: 20px;
                         border: 1px solid #888;
                         width: 80%;
                         max-width: 600px;
@@ -231,12 +238,16 @@ const Home = () => {
                         color: white;
                     }
                     @media (max-width: 600px) {
-                        body { padding: 10px; }
+                        body {
+                            padding: 10px;
+                        }
                         .container {
-                            padding: 15px; width: 100%;
+                            padding: 15px;
+                            width: 100%;
                         }
                         button {
-                            width: 100%; padding: 15px;
+                            width: 100%;
+                            padding: 15px;
                         }
                         input, select, textarea {
                             padding: 15px;
@@ -271,7 +282,19 @@ const Home = () => {
                     onChange={(e) => setText(e.target.value)}
                     style={{ height: '150px', marginBottom: '10px' }}
                 ></textarea>
-                <button onClick={handleTextSubmit}>Enviar Texto para Análise</button>
+                <button onClick={handleTextSubmit} disabled={loading}>
+                    {loading ? 'Analisando...' : 'Enviar Texto para Análise'}
+                </button>
+                {loading && (
+                    <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+                        <TailSpin
+                            height="50"
+                            width="50"
+                            color="#67B18F"
+                            ariaLabel="loading"
+                        />
+                    </div>
+                )}
                 <StudyForm
                     discipline={discipline}
                     setDiscipline={setDiscipline}
@@ -393,4 +416,3 @@ function formatDuration(seconds) {
 }
 
 export default Home;
-
