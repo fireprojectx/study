@@ -2,11 +2,12 @@
   "name": "study",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-  "dev": "next dev",
-  "start": "node server.js"
-},
+    "dev": "next dev",
+    "build": "next build",
+    "start": "node server.js"
+  },
   "author": "",
   "license": "MIT",
   "dependencies": {
