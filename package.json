@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "next dev"
-  },
+  "dev": "next dev",
+  "start": "node server.js"
+},
   "author": "",
   "license": "MIT",
   "dependencies": {

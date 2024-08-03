@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const axios = require('axios');
+const path = require('path');
 const cors = require('cors');
 
 const app = express();
@@ -9,15 +10,19 @@ const port = process.env.PORT || 5000;
 app.use(express.json());
 app.use(cors());
 
-// Rota para servir uma página inicial simples
+// Serve a página HTML na raiz
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Rota explícita para a página inicial
 app.get('/', (req, res) => {
-    res.send('Servidor está funcionando corretamente. Use a rota /analyze-text para enviar texto para análise.');
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.post('/analyze-text', async (req, res) => {
-    const { text } = req.body;
-    if (!text) {
-        return res.status(400).send('No text provided.');
+// Rota para o chat
+app.post('/chat', async (req, res) => {
+    const { message } = req.body;
+    if (!message) {
+        return res.status(400).send('No message provided.');
     }
 
     try {
@@ -26,14 +31,14 @@ app.post('/analyze-text', async (req, res) => {
             messages: [
                 {
                     role: 'system',
-                    content: 'You are a helpful assistant that extracts information from text.'
+                    content: 'You are a helpful assistant.'
                 },
                 {
                     role: 'user',
-                    content: `Extraia as disciplinas e conteúdos das matérias deste edital:\n\n${text}\n\nDisciplinas e Conteúdos:`
+                    content: message
                 }
             ],
-            max_tokens: 1000,
+            max_tokens: 500,
             n: 1,
             temperature: 0.5
         }, {
@@ -46,33 +51,10 @@ app.post('/analyze-text', async (req, res) => {
         const completionData = response.data.choices[0].message.content;
         console.log('Resposta da API:', completionData);  // Log da resposta da API
 
-        let disciplines = [];
-        let topics = [];
-
-        // Tentar fazer parsing do JSON se for possível
-        try {
-            const parsedData = JSON.parse(completionData);
-            disciplines = parsedData.disciplines || [];
-            topics = parsedData.contents || [];
-        } catch (error) {
-            // Se não for JSON, tratar como texto e fazer a extração manual
-            const lines = completionData.split('\n');
-            lines.forEach(line => {
-                if (line.toLowerCase().includes('disciplina')) {
-                    disciplines.push(line.replace('Disciplina: ', '').trim());
-                } else if (line.toLowerCase().includes('conteúdo')) {
-                    topics.push(line.replace('Conteúdo: ', '').trim());
-                }
-            });
-        }
-
-        console.log('Disciplinas:', disciplines);  // Log das disciplinas
-        console.log('Tópicos:', topics);  // Log dos tópicos
-
-        res.json({ disciplines, topics });
+        res.json({ response: completionData });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Failed to analyze text' });
+        console.error('Error:', error.response ? error.response.data : error.message);
+        res.status(500).json({ error: error.response ? error.response.data : 'Failed to process the message' });
     }
 });
 

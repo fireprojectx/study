@@ -1,0 +1,38 @@
+/* styles.css */
+body, html {
+    font-family: Arial, sans-serif;
+    padding: 0;
+    margin: 0;
+    background: #f4f4f4;
+}
+
+.container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 20px;
+    background: white;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+h1 {
+    text-align: center;
+}
+
+input, button {
+    padding: 10px;
+    margin: 10px 0;
+    display: block;
+    width: calc(100% - 22px);
+}
+
+button {
+    cursor: pointer;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+}
+
+#result {
+    font-weight: bold;
+    color: green;
+}
