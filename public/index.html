@@ -27,28 +27,32 @@
         }
         .input-group {
             margin: 15px 0;
+            display: flex;
+            align-items: center;
         }
         input[type="text"] {
-            width: calc(100% - 22px);
+            width: 100%;
             padding: 10px;
-            margin: 5px 0;
-            box-sizing: border-box;
             border: 1px solid #ccc;
-            border-radius: 5px;
+            border-radius: 5px 0 0 5px;
             font-size: 16px;
         }
         button {
-            background: #007bff;
+            background: #a4caf3;
             color: white;
             padding: 10px 20px;
             border: none;
-            border-radius: 5px;
+            border-radius: 0 5px 5px 0;
             cursor: pointer;
             font-size: 16px;
-            width: 100%;
+            margin-left: -1px; /* Slight overlap to avoid double border */
         }
         button:hover {
-            background: #0056b3;
+            background: #385b81;
+        }
+        button img {
+            width: 20px;
+            height: 20px;
         }
         #chat-box {
             margin-top: 20px;
@@ -87,11 +91,19 @@
         <h1>Chatbot</h1>
         <div class="input-group">
             <input type="text" id="message" placeholder="Enter your message">
+            <button onclick="sendMessage()">
+                <img src="https://github.com/fireprojectx/study/blob/main/enviar-mensagem.png?raw=true" alt="Send">
+            </button>
         </div>
-        <button onclick="sendMessage()">Send</button>
         <div id="chat-box"></div>
     </div>
     <script>
+        document.getElementById('message').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
         async function sendMessage() {
             const messageInput = document.getElementById('message');
             const message = messageInput.value;
